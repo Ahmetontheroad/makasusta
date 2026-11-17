@@ -1,0 +1,9 @@
+Makas Usta – hazır 3B modeller
+
+paket.glb içindeki modeller Kenney (www.kenney.nl) paketlerinden alınmıştır:
+- Car Kit 3.1: sedan, sedan-sports, hatchback-sports, suv, suv-luxury, taxi, van, delivery
+- Furniture Kit: pottedPlant, plantSmall1-3, kitchenCoffeeMachine, televisionModern, coatRackStanding, trashcan, lampRoundFloor
+
+Lisans: Creative Commons Zero (CC0 1.0) – kamu malı.
+Ticari kullanım serbest, isim belirtme zorunlu değil.
+https://creativecommons.org/publicdomain/zero/1.0/
