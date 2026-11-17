@@ -104,7 +104,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#1f2a33;font-family:-a
 (()=>{if(!/github\.io$/.test(location.hostname))return;const H='3202caf16264f83632b580c9691bc681c7da0d868441fe89805bebcd8793822a';
 const k=(location.hash.match(/k=([\w-]+)/)||[])[1]||(()=>{try{return localStorage.getItem('mu_key')}catch(e){return null}})();
 const block=()=>{document.documentElement.innerHTML='<body style="background:#1d2329;color:#fff;font:600 18px system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center">✂️ Makas Usta<br><br>Bu oyun davetle açılır.<br>Ahmet\'ten link iste.</body>'};
-if(!k){block();throw new Error('davet')}
+addEventListener('hashchange',()=>location.reload());if(!k){block();throw new Error('davet')}
 document.documentElement.style.visibility='hidden';
 crypto.subtle.digest('SHA-256',new TextEncoder().encode(k)).then(b=>{const x=[...new Uint8Array(b)].map(v=>v.toString(16).padStart(2,'0')).join('');if(x!==H){block();return}try{localStorage.setItem('mu_key',k)}catch(e){}document.documentElement.style.visibility=''})})();
 </script>
