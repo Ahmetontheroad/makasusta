@@ -1045,16 +1045,25 @@ function nearHair(x,y){
 }
 /* elde 3B alet (hazır model): imlecin altında, ucu kafaya dönük */
 const T3M={clip:'alet_makine',scis:'alet_makas',foam:'alet_kopuk',razor:'alet_ustura',grow:'alet_sprey',dye:'alet_boya_fircasi',ink:'alet_dovme',lip:'alet_ruj',eye:'alet_far_fircasi',blush:'alet_allik_fircasi',nail:'alet_oje',curl:'alet_masa',flat:'alet_duzlestirici',blow:'alet_fon',lash:'alet_rimel'};
-const T3UP={foam:1,grow:1,lip:1,nail:1};let TOOL3=null,TOOL3id=null;const _t3r=new THREE.Raycaster(),_t3s=new THREE.Sphere(),_t3p=new THREE.Vector3(),_t3c=new THREE.Vector3();
+const T3UP={foam:1,grow:1,lip:1,nail:1};let TOOL3=null,TOOL3id=null;const _t3d=new THREE.Object3D(),T3S={p:new THREE.Vector3(),q:new THREE.Quaternion()};const _t3r=new THREE.Raycaster(),_t3s=new THREE.Sphere(),_t3p=new THREE.Vector3(),_t3c=new THREE.Vector3();
 function tool3(x,y){if(!MODELS||!GS.ch||GS.view==='hand'||!T3M[GS.tool]){if(TOOL3)TOOL3.visible=false;return}
-  if(TOOL3id!==GS.tool){if(TOOL3)room.remove(TOOL3);TOOL3id=GS.tool;TOOL3=new THREE.Group();const sc=8,m=GM(T3M[GS.tool],{s:sc,sh:false});if(m){
+  if(TOOL3id!==GS.tool){if(TOOL3)room.remove(TOOL3);TOOL3id=GS.tool;TOOL3=new THREE.Group();TOOL3.visible=false;const sc=8,m=GM(T3M[GS.tool],{s:sc,sh:false});if(m){
       const b=new THREE.Box3().setFromObject(m);if(T3UP[GS.tool]){m.rotation.x=Math.PI/2;m.position.z=-b.max.y-.05}else m.position.z=-b.max.z-(GS.tool==='blow'?1.2:.05);
       m.traverse(o=>{if(o.isMesh)o.renderOrder=2});TOOL3.add(m)}room.add(TOOL3)}
   const r=renderer.domElement.getBoundingClientRect();_t3r.setFromCamera({x:(x-r.left)/r.width*2-1,y:-(y-r.top)/r.height*2+1},cam);
   rig.getWorldPosition(_t3c);_t3s.set(_t3c,1.35*(CH&&CH.w||1));if(!_t3r.ray.intersectSphere(_t3s,_t3p)){_t3r.ray.closestPointToPoint(_t3c,_t3p);_t3p.sub(_t3c).setLength(_t3s.radius).add(_t3c)}
-  const n=_t3p.clone().sub(_t3c).normalize(),cr=new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld,0),cu=new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld,1);
-  const d=n.multiplyScalar(.45).addScaledVector(cr,.8).addScaledVector(cu,.5).normalize(),tgt=_t3p.clone().sub(d);
-  TOOL3.position.copy(room.worldToLocal(_t3p.clone()));TOOL3.lookAt(tgt);TOOL3.visible=true}
+  /* yön: kullanılan tarafa göre — gövde kafanın dışına, ekranda kafadan uzağa; üst yüz kameraya */
+  const n=_t3p.clone().sub(_t3c).normalize(),v=_t3p.clone().sub(cam.position).normalize(),cr=new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld,0),cu=new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld,1);
+  const ns=n.clone().addScaledVector(v,-n.dot(v));if(ns.length()<.3)ns.copy(cr).multiplyScalar(.8).addScaledVector(cu,.6);ns.normalize();
+  const d=ns.multiplyScalar(.9).addScaledVector(cu,.22).addScaledVector(v,-.3).normalize();
+  _t3d.position.copy(room.worldToLocal(_t3p.clone()));_t3d.up.copy(v).negate();_t3d.lookAt(_t3p.clone().sub(d));
+  T3S.p.copy(_t3d.position);T3S.q.copy(_t3d.quaternion);if(!TOOL3.visible){TOOL3.position.copy(T3S.p);TOOL3.quaternion.copy(T3S.q);TOOL3.scale.setScalar(.6)}TOOL3.visible=true}
+/* her kare: yumuşak takip, açılış büyümesi, makinede titreşim, basınca hafif bastırma */
+const T3VIB={clip:1,ink:1,blow:.5,flat:.2};
+function tool3Step(){if(!TOOL3||!TOOL3.visible)return;TOOL3.position.lerp(T3S.p,.35);TOOL3.quaternion.slerp(T3S.q,.28);const sc=TOOL3.scale.x;TOOL3.scale.setScalar(sc+(1-sc)*.25);
+  const on=ptr&&ptr.mode==='tool',vb=T3VIB[GS.tool]||0,t=performance.now();
+  if(on&&vb){TOOL3.position.x+=Math.sin(t*.9)*.012*vb;TOOL3.position.y+=Math.cos(t*1.3)*.012*vb}
+  const k=TOOL3.children[0];if(k){k.userData.z0??=k.position.z;k.position.z+=((on?k.userData.z0+.12:k.userData.z0)-k.position.z)*.3}}
 function showCursor(x,y){
   const c=$('cursor'),t=TOOLS.find(t=>t.id===GS.tool);let r;
   {const t2=TOOLS.find(t=>t.id===GS.tool);r=RR(t2.up)}
@@ -1418,6 +1427,7 @@ function buildFacade(){
   const wall=(g,w,h,y,mat)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);m.position.set(0,y,0);g.add(m)};
   wall(fg,W,FH,FH/2,RM({map:brickT(10,4)}));wall(fg,W,FH*2,FH*2,RM({map:stuccoT(6,4)}));
   for(const i of[1,2])BX(fg,W+2,1.2,1.6,0,FH*i-.4,.8,sv);
+  for(const wx of[-19.6,36.4])GP(fg,'berber_diregi',X0-wx,5.5,.9,{s:5.5});
   BX(fg,W+2.8,1.8,2.6,0,FH*3-.3,1.3,sv);BX(fg,W+2,3,1.2,0,FH*3+1.9,.6,sv);
   for(const sx of[-1,1])BX(fg,2.2,FH*2,.7,sx*35,FH*2,.35,sv);   // köşe pilastrları
   // cumba (iki kat boyunca çıkma)
@@ -1613,7 +1623,6 @@ function buildOutside(){
   for(const lz of[10,50,90,130])lampPost(at(lz),X1+5.4,lz,Math.PI/2);
   for(const[tx,tz]of[[-40,z-7.7],[-72,z-7.7],[-104,z-7.7],[90,z-7.7],[122,z-7.7],[45.2,24],[45.2,70],[75,45],[75,105]])tree(at(tz),tx,tz,1.15);
   // simit arabası
-  for(const bx of[-19.6,36.4])GP(O,'berber_diregi',bx,FLOOR+5.5,z-.5,{s:5.5,ry:Math.PI});
   if(MODELS&&MODELS.g_simit_tezgahi)GP(O,'simit_tezgahi',13,FLOOR,z-7.5,{s:4.6,ry:Math.PI});else
   {const g=new THREE.Group();g.position.set(13,FLOOR,z-7.5);O.add(g);const red=CM('#c62f2f');BX(g,4.6,2.2,2.6,0,2.3,0,red);BX(g,4.8,.25,2.8,0,3.5,0,CM('#f2efe6'));
     const gl=BX(g,4.2,1.8,2.2,0,4.5,0,new THREE.MeshStandardMaterial({color:'#cfe8f5',transparent:true,opacity:.35,roughness:.05}));for(const[sx,sz]of[[-2.1,-1.1],[2.1,-1.1],[-2.1,1.1],[2.1,1.1]])BX(g,.14,3.6,.14,sx,5.3,sz,CM('#f2efe6'));
@@ -1653,6 +1662,18 @@ function buildOutside(){
     BX(O,118,7,.9,-84,FLOOR+3.5,-68,CM('#d9d2c2'));PLN(O,118,7,-84,FLOOR+3.5,-68.47,mur,Math.PI);PLN(O,118,7,-84,FLOOR+3.5,-67.53,mur,0);BX(O,118.6,.5,1.3,-84,FLOOR+7.2,-68,CM('#a8532f'));
     for(const tx of[-132,-108,-84,-60,-36])tree(O,tx,-76,1.3);for(const tx of[-120,-96,-72,-48,92,120])tree(O,tx,-61,1.05);
     BX(O,30,13,16,-96,FLOOR+6.5,-88,CM('#e6dcc6'));hipRoof(O,32,18,6,-96,FLOOR+13,-88);
+    // karşı taraf: mahalle parkı (geçici; park modelleri gelince zenginleşecek)
+    if(MODELS&&MODELS.g_sahil_banki){const gr=CM('#86a95e'),yol=CM('#d9cfb8'),hed=CM('#3f6b35'),R2=rng(77);
+      BX(O,250,.3,110,95,FLOOR+.12,-121,gr);BX(O,130,.3,110,-85,FLOOR+.12,-127,gr);
+      BX(O,250,.34,7,95,FLOOR+.14,-104,yol);for(const px of[30,160])BX(O,7,.34,110,px,FLOOR+.14,-121,yol);
+      for(let x=-28;x<=218;x+=9)if(Math.abs(x-30)>6&&Math.abs(x-160)>6)BX(O,8,1.4,1.6,x,FLOOR+.8,-66.5,hed);
+      {const c=95,cz=-104;CY(O,9,9.4,1.4,c,FLOOR+.7,cz,CM('#cfc8b8'),24);CY(O,8,8,.2,c,FLOOR+1.35,cz,CM('#6fb3d6'),24);CY(O,1,1.4,4.5,c,FLOOR+2.6,cz,CM('#cfc8b8'),10);CY(O,3,2,.6,c,FLOOR+4.9,cz,CM('#cfc8b8'),14)}
+      for(const px of[-10,55,120,190])for(const sg of[-1,1]){GP(O,'sahil_banki',px,FLOOR+.3,-104+sg*6,{s:2.8,ry:sg>0?Math.PI:0})}
+      for(const[px,pz]of[[30,-84],[30,-150],[160,-84],[160,-150],[-12,-104],[200,-104],[95,-124]])lampPost(O,px+4,pz,0);
+      for(const px of[8,72,140,205])GP(O,'ibb_cop_kutusu',px,FLOOR+.3,-98,{s:2.8});
+      for(let x=-15;x<=215;x+=19)for(const z0 of[-82,-128,-158]){if(Math.abs(x-30)<8||Math.abs(x-160)<8||(Math.abs(x-95)<16&&z0===-128))continue;tree(O,x+R2()*6,z0+R2()*8,1.1+R2()*.4)}
+      for(let x=-140;x<=-30;x+=18)for(const z0 of[-100,-135,-165])tree(O,x+R2()*6,z0+R2()*8,1.1+R2()*.4);
+      GP(O,'cay_ocagi',95,FLOOR+.3,-150,{s:3,ry:0});GP(O,'cicekci',-4,FLOOR+.3,-78,{s:3,ry:Math.PI/2})}
     // ATM kulübesi
     if(MODELS&&MODELS.g_simit_tezgahi)GP(O,'atm',24,FLOOR,-64.6,{s:4});else{BX(O,4.4,7.4,3.4,24,FLOOR+3.7,-64.6,CM('#1f8a4c'));BX(O,2.6,2.2,.2,24,FLOOR+4.6,-62.85,carMats.glass);BX(O,4.8,.5,3.8,24,FLOOR+7.6,-64.6,CM('#f2f2f2'))}
     // cadde tabelası
@@ -2101,7 +2122,7 @@ function buildStyle(){const G=new THREE.Group();room.add(G);const gold=CM('#d4af
   {const mb=new THREE.Mesh(new THREE.PlaneGeometry(27.6,31),RM({map:canvasTex(256,256,(x,w,h)=>{x.fillStyle='#f4f1ec';x.fillRect(0,0,w,h);x.strokeStyle='rgba(120,120,130,.25)';for(let i=0;i<14;i++){x.lineWidth=.6+Math.random()*1.6;x.beginPath();x.moveTo(Math.random()*w,0);x.bezierCurveTo(Math.random()*w,h*.3,Math.random()*w,h*.6,Math.random()*w,h);x.stroke()}x.strokeStyle='rgba(0,0,0,.12)';x.lineWidth=2;x.strokeRect(0,0,w/2,h/2);x.strokeRect(w/2,h/2,w/2,h/2)},4,4),roughness:.25}));mb.rotation.x=-Math.PI/2;mb.position.set(26.2,FLOOR+.03,-2.5);G.add(mb)}
   for(const sx of[14.6,18.6,25,36.8])station(G,sx,FLOOR,'f');
   for(const rx of[21.8,28]){const t=new THREE.Mesh(new THREE.TorusGeometry(1.3,.12,6,24),LED('#fff1d6'));t.position.set(rx,FLOOR+17,-17.85);G.add(t)}
-  if(MODELS&&MODELS.g_kurutma_basligi){for(const wz of[4,9])GP(G,'kurutma_basligi',14.6,FLOOR,wz,{s:5.6,ry:Math.PI/2})}else
+  if(MODELS&&MODELS.g_kurutma_basligi){for(const wz of[7,11.5])GP(G,'kurutma_basligi',14.8,FLOOR,wz,{s:5.6,ry:Math.PI/2})}else
   for(const wz of[4,9]){const g=new THREE.Group();g.position.set(14.2,FLOOR,wz);G.add(g);BX(g,2.6,1.4,2.8,0,1.9,0,CM('#d8c7b0'));BX(g,.7,3,2.8,-1.2,3.6,0,CM('#d8c7b0'));CY(g,1.3,1,1.6,-1.4,5.2,0,CM('#17181b'),14);CY(g,.9,.9,.1,-1.4,6,0,CM('#eef4f7'),14);BX(g,1.6,3.6,2.4,-1.4,2.6,0,CM('#17181b'))}
   /* 2. kat: bej + altın kemerli oje rafı + manikür masaları + yosun duvar */
   {const y=FLOOR+FH;for(const sx of[-6.5,0,-19,-23.3])station(G,sx,y,'k');
@@ -2127,17 +2148,15 @@ function buildStyle(){const G=new THREE.Group();room.add(G);const gold=CM('#d4af
     GP(G,'urun_rafi',-29.3,F,-14,{s:5.5,ry:Math.PI/2});
     GP(G,'dergi_sehpasi',-25,F,2.4,{s:6});GP(G,'cay_tepsisi',-25,F+.45*6,2.4,{s:6});
     GP(G,'semaver',9.8,F+1.1*5.5,-15.4,{s:4.5});
-    GP(G,'su_sebili',10.4,F,7,{s:6,ry:-Math.PI/2});
+    GP(G,'su_sebili',10.6,F,-10.6,{s:6,ry:-Math.PI/2});
     GP(G,'duvar_saati',7.5,F+17,-17.85,{s:8});
-    for(const ax of[-12,-21])GP(G,'avize_berber',ax,F+27.5-.5*7,-8,{s:7});
     // kadın bölümü
     GP(G,'yikama_lavabosu',16.4,F,-1.2,{s:5.4,ry:Math.PI/2});
     GP(G,'havlu_dolabi',39.6-1.5,F,10.8,{s:5.5,ry:-Math.PI/2});
     GP(G,'alet_arabasi',30.6,F,-2,{s:6,ry:-.6});
-    GP(G,'avize_berber',25,F+27.5-.5*7,-8,{s:7});
     // 2. kat (makyaj) ve VIP
     {const y=FLOOR+FH;GP(G,'alet_arabasi',5.6,y,-2,{s:6,ry:-.6});GP(G,'su_sebili',10.4,y,-12,{s:6,ry:-Math.PI/2})}
-    {const y=FLOOR+FH*2;GP(G,'alet_arabasi',5.6,y,-2,{s:6,ry:-.6});GP(G,'semaver',4.2,y+2.35,1,{s:5});GP(G,'cay_tepsisi',3.2,y+2.35,1.8,{s:5});for(const ax of[-12,-21])GP(G,'avize_berber',ax,y+27.5-.5*7,-8,{s:7})}
+    {const y=FLOOR+FH*2;GP(G,'alet_arabasi',5.6,y,-2,{s:6,ry:-.6});GP(G,'semaver',4.2,y+2.35,1,{s:5});GP(G,'cay_tepsisi',3.2,y+2.35,1.8,{s:5});}
   }
   {const FG=[0,1,2].map(()=>new THREE.Group());for(const c of[...G.children]){const y=c.position.y,f=y>FLOOR+FH*2-2?2:y>FLOOR+FH-2?1:0;FG[f].add(c)}for(const f of FG){G.add(f);bake(f);f.userData.noBake=true}}
 }
@@ -2250,7 +2269,7 @@ function applyDeco(){
     put('mob_televisionModern',{h:4.6},-28.9,FLOOR+8.4,-5,Math.PI/2);put('mob_coatRackStanding',{h:7.5},-19.6,FLOOR,-15.8,0);put('mob_trashcan',{h:2.6},-1.5,FLOOR,-15.6,0);put('mob_lampRoundFloor',{h:7.5},-28.6,FLOOR,-11.4,0);
     if(S0.unisex){put('mob_coatRackStanding',{h:7.5},25.4,FLOOR,-15.8,0);put('mob_lampRoundFloor',{h:7.5},38.8,FLOOR,1.8,0);put('mob_trashcan',{h:2.6},21.5,FLOOR,-15.6,0)}}
   if(S0.lamp)for(const x of[-9,S0.unisex?26:null]){if(x==null)continue;const g=new THREE.Group();g.position.set(x,FLOOR+21,-6);deco.add(g);
-    const sh=new THREE.Mesh(new THREE.ConeGeometry(1.8,1.6,24,1,true),RM({color:'#f2b33d',side:THREE.DoubleSide}));g.add(sh);
+    const av=GM('avize_berber',{s:7});if(av){av.position.y=-2.4;g.add(av);CY(g,.06,.06,5.9,0,4.05,0,CM("#1a1a1a"),6)}else{const sh=new THREE.Mesh(new THREE.ConeGeometry(1.8,1.6,24,1,true),RM({color:'#f2b33d',side:THREE.DoubleSide}));g.add(sh)}
     const bulb=new THREE.Mesh(new THREE.SphereGeometry(.45,12,10),new THREE.MeshBasicMaterial({color:'#fff4c9'}));bulb.position.y=-.6;g.add(bulb);
     const pl=new THREE.PointLight(0xffd59a,40,40,1.6);pl.position.y=-1;g.add(pl)}
   {const t=curTh(),tt=t==='klasik'?null:thTex(t);if(floorMesh){floorMesh.material.map=tt?tt.f:S0.wood?floorWood:floorChecker;floorMesh.material.needsUpdate=true}for(const m of GS.thW||[]){m.map=tt?tt.w:GS.thW0;m.needsUpdate=true}}
@@ -2557,7 +2576,7 @@ const modalOpen=()=>['start','result','daySum','shop','city','tzoom','quests'].s
 const OVER_P=new THREE.Vector3(1.5,13,27),OVER_T=new THREE.Vector3(-.5,-1.5,-6.5);GS.panX=GS.panXT=-9;GS.sec='m';GS.floor=0;GS.panY=GS.panYT=0;GS.street=false;GS.stF=0;GS.stX=GS.stXT=5;GS.stY=GS.stYT=FLOOR+16;GS.stZ=GS.stZT=1;GS.stPY=GS.stPYT=0;GS.coast=false;GS.cst=0;GS.stCX=GS.stCXT=-10;GS.stD=285;const _sc=new THREE.Vector3();const _sp=new THREE.Vector3(),_st=new THREE.Vector3();
 const _cp=new THREE.Vector3(),_ct=new THREE.Vector3();
 let last=performance.now(),hudT=0;
-function loop3(t){if(TOOL3&&TOOL3.visible&&(!GS.ch||$('cursor').style.display==='none'))TOOL3.visible=false;
+function loop3(t){if(TOOL3&&TOOL3.visible&&(!GS.ch||$('cursor').style.display==='none'))TOOL3.visible=false;tool3Step();
   requestAnimationFrame(loop3);const dt=Math.min(.05,(t-last)/1000);last=t;
   SH.paused=modalOpen()&&!SH.ended?true:SH.ended;
   if(GS.ch&&ptr&&ptr.mode==='tool'&&['grow','curl','flat','blow','lash'].includes(GS.tool)){const h=hitHead(ptr.x,ptr.y);if(h)applyHead(h,dt)}
