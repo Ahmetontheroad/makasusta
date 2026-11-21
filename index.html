@@ -1269,7 +1269,7 @@ const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
 const DIV_X=12;   // bölme duvarı
 const SEC={
  m:{name:'Erkek',chair:V3(0,0,0),door:V3(-14,FLOOR,-16.4),panX:-9,
-    seats:[V3(-28.4,FLOOR,-1.5),V3(-28.4,FLOOR,-5),V3(-28.4,FLOOR,-8.5)],stands:[V3(-25.5,FLOOR,-12.8),V3(-22.5,FLOOR,-14),V3(-19.5,FLOOR,-14.8)],
+    seats:[V3(-29.2,FLOOR,2.1),V3(-29.2,FLOOR,-.8),V3(-29.2,FLOOR,-3.7)],stands:[V3(-25.5,FLOOR,-12.8),V3(-22.5,FLOOR,-14),V3(-19.5,FLOOR,-14.8)],
     staff:[V3(-6.5,FLOOR,-8.5),V3(-12,FLOOR,-8.5),V3(-17.5,FLOOR,-8.5),V3(-23,FLOOR,-8.5)],face:Math.PI/2},
  f:{name:'Kadın',chair:V3(25,0,0),door:V3(31,FLOOR,-16.4),panX:26,
     seats:[V3(38.4,FLOOR,.5),V3(38.4,FLOOR,4),V3(38.4,FLOOR,7.5)],stands:[V3(37.8,FLOOR,-12.6),V3(35.4,FLOOR,-14.2),V3(37.8,FLOOR,-15.8)],
@@ -1331,7 +1331,7 @@ function buildRoom(){
   const bc=['#2f7dff','#e3312e','#2fcf7b','#f2b33d','#8b52ff'];
   for(let i=0;i<(rafM?0:7);i++){const b=new THREE.Mesh(new THREE.CylinderGeometry(.35,.4,1.3+(i%3)*.4,14),new THREE.MeshStandardMaterial({color:bc[i%5],roughness:.2}));b.position.set(-4+i,FLOOR+17.4+(i%3)*.2,-17.2);room.add(b)}
   // bekleme halıları
-  for(const x of[-27.8,37.8]){const rug=new THREE.Mesh(new THREE.PlaneGeometry(4.5,12),RM({color:x<0?'#3a3d44':'#d9cdbd'}));rug.rotation.x=-Math.PI/2;rug.position.set(x,FLOOR+.02,-5.5);room.add(rug)}
+  for(const x of[-27.8,37.8]){const L=x<0,rug=new THREE.Mesh(new THREE.PlaneGeometry(L?8:4.5,L?10:12),RM({color:L?'#3a3d44':'#d9cdbd'}));rug.rotation.x=-Math.PI/2;rug.position.set(L?-23.6:x,FLOOR+.02,L?-.8:-5.5);room.add(rug)}
   // kadın bölümü kepengi (unisex alınana kadar)
   const sh=new THREE.Mesh(new THREE.BoxGeometry(.4,26,31),new THREE.MeshStandardMaterial({map:canvasTex(256,256,(x,w,h)=>{x.fillStyle='#9aa3ab';x.fillRect(0,0,w,h);x.fillStyle='#868f97';for(let i=0;i<h;i+=12)x.fillRect(0,i,w,4);
       x.fillStyle='#d0587e';x.fillRect(40,90,176,70);x.fillStyle='#fff';x.font='bold 30px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('YAKINDA',128,112);x.font='bold 17px sans-serif';x.fillText('Kadın bölümü · 🛒 Dükkân',128,140)}),roughness:.6}));
@@ -1385,7 +1385,7 @@ function buildUpper(fl){
   // tavan/döşeme (alttaki katın tavanı)
   const slab=new THREE.Mesh(new THREE.BoxGeometry(72,4,31),RM({color:'#d8d2c8'}));slab.position.set(5,y-2,-2.5);room.add(slab);
   // ayna + bekleme halısı
-  const rug=new THREE.Mesh(new THREE.PlaneGeometry(4.5,12),RM({color:vip?'#2a2a2e':'#e9dccb'}));rug.rotation.x=-Math.PI/2;rug.position.set(-27.8,y+.04,-5.5);room.add(rug);
+  const rug=new THREE.Mesh(new THREE.PlaneGeometry(8,10),RM({color:vip?'#2a2a2e':'#e9dccb'}));rug.rotation.x=-Math.PI/2;rug.position.set(-23.6,y+.04,-.8);room.add(rug);
   if(vip){const cp=new THREE.Mesh(new THREE.PlaneGeometry(3.4,14),RM({color:'#a3182c'}));cp.rotation.x=-Math.PI/2;cp.position.set(-14,y+.05,-9.5);room.add(cp);
     const ch=new THREE.Group();ch.position.set(-9,y+24,-6);room.add(ch);const gold=RM({color:'#e2c06a',metalness:.8,roughness:.25});
     const ring=new THREE.Mesh(new THREE.TorusGeometry(2.4,.15,8,32),gold);ring.rotation.x=Math.PI/2;ch.add(ring);
@@ -2296,7 +2296,7 @@ function buildStyle(){const G=new THREE.Group();room.add(G);const gold=CM('#d4af
     GP(G,'resepsiyon_tezgahi',7,F,-15.2,{s:5.5});GP(G,'sterilizator',5,F+1.1*5.5,-15.4,{s:5.5});GP(G,'sac_kurutma_havlusu',8.8,F+1.1*5.5,-15.2,{s:6});
     GP(G,'alet_arabasi',5.6,F,-2,{s:6,ry:-.6});
     GP(G,'urun_rafi',-29.3,F,-14,{s:5.5,ry:Math.PI/2});
-    GP(G,'dergi_sehpasi',-25,F,2.4,{s:6});GP(G,'cay_tepsisi',-25,F+.45*6,2.4,{s:6});
+    GP(G,'dergi_sehpasi',-22.4,F,-.8,{s:6});GP(G,'cay_tepsisi',-22.4,F+.45*6,-.8,{s:6});
     GP(G,'semaver',9.8,F+1.1*5.5,-15.4,{s:4.5});
     GP(G,'su_sebili',10.6,F,-10.6,{s:6,ry:-Math.PI/2});
     GP(G,'duvar_saati',7.5,F+17,-17.85,{s:8});
@@ -2401,7 +2401,7 @@ function applyDeco(){
     for(const sx of[-1,1]){BX(c,.75,1.9,3.1,sx*1.65,2.3,-.05,m);const ar=CY(c,.55,.55,3.2,sx*1.68,3.3,-.05,m,14);ar.rotation.x=Math.PI/2;const fr=CY(c,.56,.56,.12,sx*1.68,3.3,1.56,dk,14);fr.rotation.x=Math.PI/2}
     for(const[a2,b2]of[[-1,-1],[1,-1],[-1,1],[1,1]])CY(c,.16,.09,.75,a2*1.6,.35,b2*1.3,RM({color:'#3a2a1c'}),8);deco.add(c)};
   const sofaRow=(sec,n,col,k)=>{if(!(MODELS&&MODELS.g_bekleme_kanepesi_erkek)){for(let i=0;i<n;i++)seatMesh(SEC[sec].seats[i],col,SEC[sec].face);return}if(!n)return;const S=SEC[sec].seats,f=SEC[sec].face,c=S[1].clone();
-    const m=GM(k,{hi:1,s:PS,sx:10.6/(k==='bekleme_kanepesi_erkek'?2.1:1.6),ry:f,tint:sec==='v'?{velvet_cream:'#c9a24a',velvet_welt:'#8a6a2a'}:sec==='m'?null:{velvet_cream:col}});if(m){m.position.set(c.x-Math.sin(f)*.9,c.y,c.z);deco.add(m)}};
+    const m=GM(k,{hi:1,s:PS,sx:10.6/(k==='bekleme_kanepesi_erkek'?2.1:1.6),ry:f,tint:sec==='v'?{velvet_cream:'#c9a24a',velvet_welt:'#8a6a2a'}:sec==='m'?null:{velvet_cream:col}});if(m){m.position.set(c.x-Math.sin(f)*.1,c.y,c.z);deco.add(m)}};
   sofaRow('m',S0.seats,'#6b4a30','bekleme_kanepesi_erkek');
   if(S0.unisex)sofaRow('f',3,'#d8c7b0','bekleme_kanepesi_kadin');
   if(S0.k2)sofaRow('k',3,'#e9d9c4','bekleme_kanepesi_kadin');
@@ -2412,14 +2412,14 @@ function applyDeco(){
     {const km=MDL('mob_kitchenCoffeeMachine',{h:2.2,ry:Math.PI});if(km){km.position.set(-1,3.4,0);g.add(km)}else{const mac=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.8,1.2),RM({color:'#30343a',roughness:.4}));mac.position.set(-.9,4.3,0);g.add(mac)}}
     for(let i=0;i<3;i++){const cup=new THREE.Mesh(new THREE.CylinderGeometry(.25,.2,.5,12),RM({color:'#ffffff'}));cup.position.set(.4+i*.6,3.65,.2);g.add(cup)}
     const sg=new THREE.Mesh(new THREE.PlaneGeometry(3,1),new THREE.MeshBasicMaterial({map:canvasTex(256,86,(x,w,h)=>{x.fillStyle='#3b2618';x.fillRect(0,0,w,h);x.fillStyle='#ffd99a';x.font='bold 46px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('☕ KAHVE · ÇAY',w/2,h/2)})}));sg.position.set(0,7,-.85);g.add(sg)}
-  if(S0.plant)for(const[x,z]of[[-29,-17],[11,-17],[-29,4],[S0.unisex?39:null,-17],[S0.unisex?13.5:null,4]]){if(x==null)continue;const g=new THREE.Group();g.position.set(x,FLOOR,z);
+  if(S0.plant)for(const[x,z]of[[-29,-17],[11,-17],[-29.4,-10.9],[S0.unisex?39:null,-17],[S0.unisex?13.5:null,4]]){if(x==null)continue;const g=new THREE.Group();g.position.set(x,FLOOR,z);
     const pm=MDL(['mob_pottedPlant','mob_plantSmall1','mob_plantSmall2','mob_plantSmall3'][((x+z)>>>0)%4],{h:5.2});if(pm){g.add(pm);deco.add(g);continue}
     const pot=new THREE.Mesh(new THREE.CylinderGeometry(.9,.7,1.6,16),RM({color:'#c96f43'}));pot.position.y=.8;g.add(pot);
     for(let i=0;i<6;i++){const lf=new THREE.Mesh(new THREE.SphereGeometry(.9,10,8),RM({color:i%2?'#3f9a4f':'#2f7d3e'}));lf.scale.set(.5,1.3,.5);lf.position.set(Math.cos(i)*.5,2.6+(i%3)*.5,Math.sin(i)*.5);lf.rotation.z=Math.cos(i)*.4;g.add(lf)}deco.add(g)}
   if(S0.poster)[['1970',-29.9,-7.5,'#2c5fd6'],['✂',-29.9,8.5,'#d6322f']].forEach(([t,x,z,c])=>{const pl=new THREE.Mesh(new THREE.PlaneGeometry(4,5),new THREE.MeshBasicMaterial({map:canvasTex(160,200,(x2,w,h)=>{x2.fillStyle='#5e3c25';x2.fillRect(0,0,w,h);x2.fillStyle='#f6ecd9';x2.fillRect(12,12,w-24,h-24);x2.fillStyle=c;x2.font='bold 64px serif';x2.textAlign='center';x2.textBaseline='middle';x2.fillText(t,w/2,h/2-10);x2.font='bold 18px sans-serif';x2.fillText('BERBER',w/2,h-40)})}));
     pl.rotation.y=Math.PI/2;pl.position.set(x,FLOOR+12,z);deco.add(pl);const fr=GM('duvar_posteri_berber',{hi:1,s:5.6,ry:Math.PI/2});if(fr){fr.position.set(x-.1,FLOOR+12-2.8,z);deco.add(fr);pl.position.x=x+.18;pl.scale.set(.82,.86,1)}});
   {const put=(ad,o,x,y,z,ry)=>{const m=MDL(ad,o);if(!m)return;m.position.set(x,y,z);m.rotation.y=ry||0;deco.add(m)};
-    put('mob_televisionModern',{h:4.6},-28.9,FLOOR+8.4,-5,Math.PI/2);put('mob_coatRackStanding',{h:7.5},-19.6,FLOOR,-15.8,0);put('mob_trashcan',{h:2.6},-1.5,FLOOR,-15.6,0);put('mob_lampRoundFloor',{h:7.5},-28.6,FLOOR,-9.2,0);
+    put('mob_televisionModern',{h:4.6},-28.9,FLOOR+8.4,-5,Math.PI/2);put('mob_coatRackStanding',{h:7.5},-19.6,FLOOR,-15.8,0);put('mob_trashcan',{h:2.6},-1.5,FLOOR,-15.6,0);put('mob_lampRoundFloor',{h:7.5},-29.2,FLOOR,-7.4,0);
     if(S0.unisex){put('mob_coatRackStanding',{h:7.5},25.4,FLOOR,-15.8,0);put('mob_trashcan',{h:2.6},21.5,FLOOR,-15.6,0)}}
   if(S0.lamp)for(const x of[-9,S0.unisex?26:null]){if(x==null)continue;const g=new THREE.Group();g.position.set(x,FLOOR+21,-6);deco.add(g);
     const av=GM(MODELS&&MODELS.g_sarkit_lamba?'sarkit_lamba':'avize_berber',{s:7});if(av){if(MODELS.g_sarkit_lamba){av.position.y=7;g.add(av);CY(g,.55,.55,.25,0,6.9,0,CM('#1a1a1a'),16)}else{av.position.y=-2.4;g.add(av);g.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(av),top=bb.max.y-g.position.y-.05,L=7-top;CY(g,.09,.09,L,0,top+L/2,0,CM('#1a1a1a'),8);CY(g,.55,.55,.25,0,6.9,0,CM('#1a1a1a'),16)}}else{const sh=new THREE.Mesh(new THREE.ConeGeometry(1.8,1.6,24,1,true),RM({color:'#f2b33d',side:THREE.DoubleSide}));g.add(sh)}
@@ -2492,7 +2492,7 @@ function stepShop(dt){
     for(const sec of SECS){if(!secOpen(sec))continue;SH.next[sec]-=dt;if(SH.next[sec]<=0){arrive(sec);SH.next[sec]=(B[sec][0]+Math.random()*B[sec][1])*k}}}
   for(const c of [...SH.queue]){
     if(c.state==='peek'){if(walk(c,dt)){c.state='leave';c.target=exitOf(c)}}
-    else if(c.state==='in'){if(walk(c,dt)){c.state='wait';if(c.sit)setSit(c.g,true)}c.pat-=dt*.5}
+    else if(c.state==='in'){if(walk(c,dt)){c.state='wait';if(c.sit)setSit(c.g,true);c.g.rotation.y=c.g.userData.art?SEC[c.sec].face:Math.PI/2;c.g.position.y=c.fy+(c.g.userData.dy||0)}c.pat-=dt*.5}
     else if(c.state==='wait'){c.pat-=dt*(c.sit?.5:1);if(c.pat<=0){setSit(c.g,false);c.state='leave';c.target=exitOf(c);SH.lost++;P.rep=clamp(P.rep-.06*novF()*clamp(P.rep/2.5,.25,1),0,5);save();say((c.order.rich?'💎 Zengin müşteri ':c.order.sp?'⭐ Özel müşteri ':'')+c.ch.name+' bekleyemedi, gitti! 😠',1800);buzz(60);renderChips()}}
     else if(c.state==='chair'){if(walk(c,dt)){removeCust(c);GS.sim?GS.sim(c):seat(c)}}
     else if(c.state==='staffWalk'){if(walk(c,dt)){c.state='staff';setSit(c.g,true);setCape(c.g,true);c.g.rotation.y=0;c.g.position.copy(c.stf.seat);{const dd=c.g.userData.art?artSit(c.g.userData.art,SEATH.staff):-1.0;c.g.userData.dy=dd;c.g.position.y=c.fy+dd}c.stf.t=0}}
