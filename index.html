@@ -2085,7 +2085,7 @@ function buildDistrict(k){const rc=DREC[k],lv=P.br[k]||0,key=k+lv+'|'+NMB(k);let
   const bld=(st,cx,w,fl,roof,o)=>{o=o||{};const m=o.m||mat(st,w<=20?3:4,fl,o.pal||rc.pal,o.shops||rc.shops);apt(o.G||G,cx,o.z??ZF+15,w,o.d||30,fl,m.userData.col,m,roof==='hip'?hip:flat);return fl*20+24};
   const DM=MODELS&&MODELS.g_bina_kose&&DMOD[k],DR=rng(k.length*131+7);
   const rowB=(wf,bf,sp,gap)=>{for(const sg of[-1,1]){let x=14.2,i=0,j=sg>0?1:0;while(x<(DM?385:236)){const f=sp&&sp[(sg>0?'r':'l')+i];let w;
-      if(f){w=f[0];f[1](sg*(x+w/2),w,sg,i)}else if(DM){const kk=DM.l[j++%DM.l.length];w=BW[kk][0]*BU;sBld(G,kk,sg*(x+w/2),ZF,30,Math.PI,DR);if(DM.tree)tree(G,sg*(x+w+2.5),ZF+5+R()*6,1.3+R()*.5)}
+      if(f){w=f[0];f[1](sg*(x+w/2),w,sg,i)}else if(DM){const kk=DM.l[j++%DM.l.length];w=BW[kk][0]*BU;sBld(G,kk,sg*(x+w/2),ZF,30,Math.PI,DR);if(DM.tree){const tz=ZF+5+R()*6,ts=1.3+R()*.5;if(!(sp&&sp[(sg>0?'r':'l')+(i+1)]))tree(G,sg*(x+w+2.5),tz,ts)}}
       else{w=wf();bf(sg*(x+w/2),w,sg,i)}x+=w+(DM&&!f?(DM.tree?5:.4):(gap??.2));i++}}};
   const backRow=(bf,step,z)=>{for(let x=-224;x<=224;x+=step)bf(x+R()*3,z??ZF+62+R()*4)};
   const branch=(st,fl,pal,roof,o)=>{o=o||{};const c=pick(pal),sh=lv?['BERBER · KUAFÖR','#1d1214']:['KİRALIK','#c62f2f'],m=st==='apt'?aptTex(8800+k.length,c,4,fl,sh):facTex(8800+k.length,st,c,4,fl,sh);m.userData.col=c;
@@ -2103,15 +2103,16 @@ function buildDistrict(k){const rc=DREC[k],lv=P.br[k]||0,key=k+lv+'|'+NMB(k);let
     BX(G,1500,4,150,0,FLOOR+2,zo-75,CM('#8f8a82'));plane(1500,150,0,FLOOR+4.05,zo-75,hat);void pt};
   const KIOSK=['#c62f2f','#2c5fd6','#d7a12a','#d0587e','#3f6f4a'];
   /* ================= ÜSKÜDAR · Salacak sahil yolu ================= */
-  if(k==='uskudar'){const pal=['#f7f4ee','#f3efe6','#f0e5d0','#f6f0df','#ead0c6','#e3d9c8','#fbf9f4'],sh=[['BALIKÇI','#2c5fd6'],['ÇAY EVİ','#6b4329'],['BÜFE','#c62f2f'],['FIRIN','#d7a12a'],['KAHVALTI','#3f6f4a'],['TAVUKÇU','#1f4fa8']],o={pal,shops:sh};
+  if(k==='uskudar'){let STX=null;const pal=['#f7f4ee','#f3efe6','#f0e5d0','#f6f0df','#ead0c6','#e3d9c8','#fbf9f4'],sh=[['BALIKÇI','#2c5fd6'],['ÇAY EVİ','#6b4329'],['BÜFE','#c62f2f'],['FIRIN','#d7a12a'],['KAHVALTI','#3f6f4a'],['TAVUKÇU','#1f4fa8']],o={pal,shops:sh};
     branch('apt',2,['#f3efe6'],'hip');
-    rowB(()=>pick([18,20,24]),(cx,w)=>{bld('apt',cx,w,2+((R()*2)|0),'hip',o);tree(G,cx+w/2+4.5,ZF+5+R()*6,1.3+R()*.5);tree(G,cx+w/2+4.5,ZF+17+R()*8,1.5+R()*.6)},null,9);
+    rowB(()=>pick([18,20,24]),(cx,w)=>{bld('apt',cx,w,2+((R()*2)|0),'hip',o);tree(G,cx+w/2+4.5,ZF+5+R()*6,1.3+R()*.5);tree(G,cx+w/2+4.5,ZF+17+R()*8,1.5+R()*.6)},MODELS&&MODELS.g_merdivenli_sokak?{l1:[14,cx=>{STX=cx;window.__STX=cx;// iki bina arasından yamaca çıkan merdivenli sokak
+      GP(G,'merdivenli_sokak',cx,FLOOR-.05,ZF+1,{s:1,sx:82/20,sy:33/8,sz:10/6,ry:-Math.PI/2})}]}:null,9);
     // yamaç: evler basamak basamak yükselir, araları ağaç
     const yb=z=>62*(z-(ZF+31))/94,hill=new THREE.Mesh(new THREE.PlaneGeometry(1500,112.7),CM('#7f9a62'));hill.rotation.x=-Math.PI/2-Math.atan(62/94);hill.position.set(0,FLOOR-1.3+31,ZF+78);if(MODELS&&MODELS.g_arazi_yamac_dik){for(let x=-300;x<=300;x+=60){GP(G,'arazi_yamac_dik',x,FLOOR-1.3-.4*4.13,ZF+31,{s:4.13,sx:4.7,sz:3.02,ry:-Math.PI/2});GP(G,'istinat_duvari',x+30,FLOOR-1.3,ZF+31.2,{s:1.2,sx:3.02,ry:Math.PI})}for(const x of[-180,0,180])GP(G,'tepe_korusu',x,FLOOR-1.3+60,ZF+140,{s:3})}else G.add(hill);
-    for(const[zc2,st]of[[ZF+58,39],[ZF+94,47]]){const g=new THREE.Group();g.position.y=yb(zc2-12);G.add(g);for(let x=-222;x<=222;x+=st){if(zc2===ZF+58&&Math.abs(x-66)<20)continue;bld('apt',x+R()*4,pick([18,20,22]),2,'hip',{pal,shops:sh,G:g,z:zc2,d:24})}
+    for(const[zc2,st]of[[ZF+58,39],[ZF+94,47]]){const g=new THREE.Group();g.position.y=yb(zc2-12);G.add(g);for(let x=-222;x<=222;x+=st){if(zc2===ZF+58&&Math.abs(x-66)<20)continue;if(STX!=null&&Math.abs(x-STX)<20)continue;bld('apt',x+R()*4,pick([18,20,22]),2,'hip',{pal,shops:sh,G:g,z:zc2,d:24})}
       if(zc2===ZF+58&&MODELS&&MODELS.g_cami_kubbe){GP(g,'cami_kubbe',66,FLOOR,zc2,{s:1.3,ry:Math.PI});GP(g,'ezan_minare',76,FLOOR,zc2+6,{s:1.25})}else
       if(zc2===ZF+58){const m=new THREE.Group();m.position.set(66,0,zc2);g.add(m);const stn=CM('#f1ece0');BX(m,16,12,14,0,FLOOR+6,0,stn);const dm=new THREE.Mesh(new THREE.SphereGeometry(6.4,14,8,0,6.3,0,1.6),CM('#8f9aa3'));dm.position.y=FLOOR+12;m.add(dm);CY(m,.9,1.1,34,10,FLOOR+17,5,stn,8);CY(m,1.5,1.5,.7,10,FLOOR+27,5,stn,8);const c=new THREE.Mesh(new THREE.ConeGeometry(1.1,6,8),CM('#5a6670'));c.position.set(10,FLOOR+37,5);m.add(c)}}
-    for(const zt of[ZF+38,ZF+76,ZF+112]){const g=new THREE.Group();g.position.y=yb(zt)-1;G.add(g);for(let x=-235;x<=235;x+=9+R()*7)tree(g,x,zt+R()*8-4,1.6+R()*1.1)}
+    for(const zt of[ZF+38,ZF+76,ZF+112]){const g=new THREE.Group();g.position.y=yb(zt)-1;G.add(g);for(let x=-235;x<=235;x+=9+R()*7){const tz=zt+R()*8-4,ts=1.6+R()*1.1;if(STX==null||Math.abs(x-STX)>9)tree(g,x,tz,ts)}}
     // sahil: mavi bisiklet yolu, yürüyüş yolu, kayalar, deniz
     const zb=zr-Wd-3.3;plane(1500,5,0,FLOOR+.03,zb,CM('#2f6fb3'));plane(1500,.3,0,FLOOR+.05,zb,RM({map:canvasTex(64,8,x=>{x.fillStyle='#2f6fb3';x.fillRect(0,0,64,8);x.fillStyle='#f2efe6';x.fillRect(0,0,30,8)},160,1)}));
     bollards(zr-Wd-.5,9,'#3a3d42');
